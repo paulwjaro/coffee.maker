@@ -50,7 +50,7 @@ def run_coffee_maker():
             if resources["milk"] >= MENU[selection]["ingredients"]["milk"]:
                 if resources["coffee"] >= MENU[selection]["ingredients"]["coffee"]:
                     calculate_payment(MENU[selection]["cost"], MENU[selection]["ingredients"]["water"],
-                                      MENU[selection]["ingredients"]["milk"], MENU[selection]["ingredients"]["coffee"])
+                                      MENU[selection]["ingredients"]["milk"], MENU[selection]["ingredients"]["coffee"], selection.capitalize())
                 else:
                     print("Sorry, this machine is out of required coffee. Please try again later.")
             else:
@@ -73,7 +73,7 @@ def run_coffee_maker():
 
 
 def take_money():
-    coin_taken = input("Please Insert Coin or Request Refund:").lower()
+    coin_taken = input("Please Insert Coin(Quarter, Dime, Nickle, Penny, Refund): ").lower()
 
     if coin_taken == "refund":
         return -1
@@ -94,15 +94,15 @@ def take_money():
         return -2
 
 
-def calculate_payment(required_payment, water, milk, coffee):
+def calculate_payment(required_payment, water, milk, coffee, selection):
     payment_needed = required_payment
     payment_taken = 0
     change = 0
     refund = False
 
     while payment_taken < payment_needed:
-        print("Needed: " + str(payment_needed))
-        print("Received: " + str(payment_taken))
+        print("Needed: $" + str("{:.2f}".format(payment_needed)))
+        print("Received: $" + str("{:.2f}".format(payment_taken)))
         action = take_money()
         if action == -2:
             print("Not a valid coin.")
@@ -113,13 +113,13 @@ def calculate_payment(required_payment, water, milk, coffee):
             payment_taken += action
 
     if refund:
-        print("You have received a Refund.")
+        print("You have received a $" + str("{:.2f}".format(payment_taken)) + " Refund.")
     else:
         if payment_taken > payment_needed:
             change = payment_taken - payment_needed
 
         if change > 0:
-            print("Now Pouring... Enjoy your Coffee!")
+            print("Now Pouring... Enjoy your " + selection + "!")
             print("You have received $" + str("{:.2f}".format(change)) + " in change.")
         else:
             print("Now Pouring... Enjoy your Coffee!")
@@ -129,5 +129,5 @@ def calculate_payment(required_payment, water, milk, coffee):
         resources["coffee"] -= coffee
         resources["money"] += required_payment
 
-
+1
 run_coffee_maker()
