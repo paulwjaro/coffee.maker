@@ -2,6 +2,7 @@ MENU = {
     "espresso": {
         "ingredients": {
             "water": 50,
+            "milk": 0,
             "coffee": 18,
         },
         "cost": 1.5,
@@ -28,51 +29,115 @@ resources = {
     "water": 300,
     "milk": 200,
     "coffee": 100,
+    "money": 0,
+}
+
+payment = {
+    "quarter": 0.25,
+    "dime": 0.1,
+    "nickle": 0.05,
+    "penny": 0.01,
 }
 
 prompts = ["espresso", "latte", "cappuccino", "report", "off"]
 
 
 def run_coffee_maker():
-    selection = input("What would you like? (espresso, latte, cappuccino):")
-    if selection.lower() == prompts[0]:
-        print(prompts[0])
+    selection = input("What would you like? (espresso, latte, cappuccino):").lower()
+    if selection == prompts[0] or selection.lower() == prompts[1] or selection.lower() == prompts[2]:
+        print("You have selected: " + selection.capitalize())
+        if resources["water"] >= MENU[selection]["ingredients"]["water"]:
+            if resources["milk"] >= MENU[selection]["ingredients"]["milk"]:
+                if resources["coffee"] >= MENU[selection]["ingredients"]["coffee"]:
+                    calculate_payment(MENU[selection]["cost"], MENU[selection]["ingredients"]["water"],
+                                      MENU[selection]["ingredients"]["milk"], MENU[selection]["ingredients"]["coffee"])
+                else:
+                    print("Sorry, this machine is out of required coffee. Please try again later.")
+            else:
+                print("Sorry, this machine is out of required milk. Please try again later.")
+        else:
+            print("Sorry, this machine is out of required water. Please try again later.")
         run_coffee_maker()
-    elif selection.lower() == prompts[1]:
-        print(prompts[1])
+    elif selection == prompts[3]:
+        print("Machine Resource Report")
+        print("Water: " + str(resources["water"]))
+        print("Milk: " + str(resources["milk"]))
+        print("Coffee: " + str(resources["coffee"]))
+        print("Money: $" + str(resources["money"]))
         run_coffee_maker()
-    elif selection.lower() == prompts[2]:
-        print(prompts[2])
-        run_coffee_maker()
-    elif selection.lower() == prompts[3]:
-        print(prompts[3])
-        run_coffee_maker()
-    elif selection.lower() == prompts[4]:
+    elif selection == prompts[4]:
         print("Machine Off.")
     else:
         print("Not a valid Selection")
         run_coffee_maker()
 
 
+def take_money():
+    coin_taken = input("Please Insert Coin or Request Refund:").lower()
+
+    if coin_taken == "refund":
+        return -1
+
+    if coin_taken == "quarter":
+        how_many = input("How Many?: ")
+        return payment[coin_taken] * float(how_many)
+    elif coin_taken == "dime":
+        how_many = input("How Many?: ")
+        return payment[coin_taken] * float(how_many)
+    elif coin_taken == "nickle":
+        how_many = input("How Many?: ")
+        return payment[coin_taken] * float(how_many)
+    elif coin_taken == "penny":
+        how_many = input("How Many?: ")
+        return payment[coin_taken] * float(how_many)
+    else:
+        return -2
+
+
+def calculate_payment(required_payment, water, milk, coffee):
+    payment_needed = required_payment
+    payment_taken = 0
+    change = 0
+    refund = False
+
+    while payment_taken < payment_needed:
+        print("Needed: " + str(payment_needed))
+        print("Received: " + str(payment_taken))
+        action = take_money()
+        if action == -2:
+            print("Not a valid coin.")
+        elif action == -1:
+            refund = True
+            break
+        else:
+            payment_taken += action
+
+    if refund:
+        print("You have received a Refund.")
+    else:
+        if payment_taken > payment_needed:
+            change = payment_taken - payment_needed
+
+        if change > 0:
+            print("Now Pouring... Enjoy your Coffee!")
+            print("You have received $" + str("{:.2f}".format(change)) + " in change.")
+        else:
+            print("Now Pouring... Enjoy your Coffee!")
+
+        resources["water"] -= water
+        resources["milk"] -= milk
+        resources["coffee"] -= coffee
+        resources["money"] += required_payment
+
+
+
+
+
+
+
+
 run_coffee_maker()
 
-# TODO: 1. Create Report of Available Resources
 
-# TODO: 1.1. Prompt user by asking “What would you like? (espresso/latte/cappuccino):”
-# TODO: 1.1.a Check the user’s input to decide what to do next.
-# TODO: 1.1.b The prompt should show every time action has completed, e.g. once the drink is dispensed. The prompt
-#  should show again to serve the next customer.
-
-# TODO: 1.2. Turn off the Coffee Machine by entering “off” to the prompt.
-# TODO: 1.2.a For maintainers of the coffee machine, they can use “off” as the secret word to turn off
-#   the machine. Your code should end execution when this happens.
-
-# TODO: 1.3. Print report.
-# TODO: 1.3.a  When the user enters “report” to the prompt, a report should be generated that shows
-#   the current resource values. e.g.
-#   Water: 100ml
-#   Milk: 50ml
-#   Coffee: 76g
-#   Money: $2.5
 
 
