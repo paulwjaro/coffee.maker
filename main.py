@@ -130,14 +130,4 @@ def calculate_payment(required_payment, water, milk, coffee):
         resources["money"] += required_payment
 
 
-
-
-
-
-
-
 run_coffee_maker()
-
-
-
-
